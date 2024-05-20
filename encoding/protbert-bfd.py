@@ -34,19 +34,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedKFold
 import pickle
 from collections import Counter
-# 字符之间必须用空格隔开才行，否则就会认为整条序列是一个氨基酸，编码出来都是一样的
+
 def read_fasta(file_path):
     sequences = []
     with open(file_path, 'r') as file:
         sequence = ""
         for line in file:
-            if line.startswith('>'):  # 忽略注释行
+            if line.startswith('>'):
                 if sequence:
-                    sequences.append(" ".join(sequence))  # 将序列字符用空格连接
-                    sequence = ""  # 重置序列字符串
+                    sequences.append(" ".join(sequence)) 
+                    sequence = "" 
             else:
-                sequence += line.strip()  # 读取序列内容并去除换行符
-        if sequence:  # 处理最后一个序列
+                sequence += line.strip()  
+        if sequence:  
             sequences.append(" ".join(sequence))
     return sequences
 
@@ -62,13 +62,13 @@ y_test = np.array([1] * 171+[0] * 171)
 Xtest_sequences = read_fasta(Xtest_file)
 Xtrain_sequences = read_fasta(Xtrain_file)
 
-# 替换特定字符（如果需要）
+
 Xtest_sequences = [re.sub(r"[UZOB]", "X", sequence) for sequence in Xtest_sequences]
 Xtrain_sequences = [re.sub(r"[UZOB]", "X", sequence) for sequence in Xtrain_sequences]
-# 加载BERT模型和tokenizer
+
 tokenizer = BertTokenizer.from_pretrained("E:/翻译后修饰/代码+压缩包/hugging-face/protbert_bfd", do_lower_case=False)
 model1 = TFBertModel.from_pretrained("E:/翻译后修饰/代码+压缩包/hugging-face/protbert_bfd", from_pt=True)
-# 处理序列并获取嵌入
+
 def get_embeddings(sequences):
     ids = tokenizer.batch_encode_plus(sequences, add_special_tokens=True, padding=True, return_tensors="tf")
     input_ids = ids['input_ids']
@@ -82,7 +82,7 @@ def get_embeddings(sequences):
         seq_emd = embedding[seq_num][1:seq_len - 1]
         features.append(seq_emd)
     return features
-# 获取嵌入
+#
 x_test_features = get_embeddings(Xtest_sequences)
 x_train_features = get_embeddings(Xtrain_sequences)
 
